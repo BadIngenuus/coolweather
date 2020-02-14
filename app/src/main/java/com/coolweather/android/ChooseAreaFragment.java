@@ -1,7 +1,9 @@
 package com.coolweather.android;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +79,12 @@ public class ChooseAreaFragment extends Fragment {
                 }else if (currentLevel ==LEVEL_CITY){
                     selectedCity = cityList.get(position);
                     queryCounties();
+                }else if (currentLevel == LEVEL_COUNTY){
+                    String weatherId = countyList.get(position).getWeatherId();
+                    Intent intent = new Intent(getActivity(),WeatherActivity.class);
+                    intent.putExtra("weather_id",weatherId);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
@@ -125,7 +133,7 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         }else {
             int provinceCode = selectedProvince.getProvinceCode();
-            String address = "http://guolin.tech/api/china"+provinceCode;
+            String address = "http://guolin.tech/api/china/"+provinceCode;
             queryFromServer(address,"city");
         }
     }
@@ -145,7 +153,8 @@ public class ChooseAreaFragment extends Fragment {
         }else {
             int provinceCode = selectedProvince.getProvinceCode();
             int cityCode = selectedCity.getCityCode();
-            String address = "http://guolin.tech/api/china"+provinceCode + "/"+cityCode;
+            String address = "http://guolin.tech/api/china/"+provinceCode + "/"+cityCode;
+            Log.d("ssss",address);
             queryFromServer(address,"county");
         }
     }
@@ -174,6 +183,7 @@ public class ChooseAreaFragment extends Fragment {
                     result = Utility.handleCityResponse(responseText,selectedProvince.getId());
                 }else if ("county".equals(type)){
                     result = Utility.handleCountyResponse(responseText,selectedCity.getId());
+                    Log.d("ssss","3"+result);
                 }
                 if (result){
                     getActivity().runOnUiThread(new Runnable() {
